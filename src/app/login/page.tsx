@@ -44,7 +44,7 @@ export default function LoginPage() {
       console.log("LOGIN RESPONSE:", data);
 
       if (res.ok) {
-        router.push("/dashboard");
+        window.location.href = "/dashboard";
       } else {
         setError(data.error || "Login failed");
       }
