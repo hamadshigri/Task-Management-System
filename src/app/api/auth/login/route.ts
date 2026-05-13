@@ -39,11 +39,11 @@ export async function POST(req: Request) {
       { expiresIn: "7d" }
     );
 
-    (await cookies()).set("token", token, {
+    const cookieStore = await cookies();
+    cookieStore.set("token", token, {
       httpOnly: true,
-      secure:
-        process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      secure: true,
+      sameSite: "lax",
       path: "/",
       maxAge: 60 * 60 * 24 * 7,
     });
