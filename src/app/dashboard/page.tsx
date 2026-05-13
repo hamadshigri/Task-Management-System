@@ -13,7 +13,6 @@ type Task = {
 
 export default function Dashboard() {
   const [tasks, setTasks] = useState<Task[]>([]);
-
   const [filter, setFilter] = useState("all");
 
   const [form, setForm] = useState({
@@ -23,63 +22,112 @@ export default function Dashboard() {
     dueDate: "",
   });
 
-  // Fetch tasks
+  // Fetch Tasks
   const fetchTasks = async () => {
-    const res = await fetch("/api/tasks");
+    try {
+      const res = await fetch("/api/tasks", {
+        credentials: "include",
+      });
 
-    const data = await res.json();
+      console.log("Fetch Status:", res.status);
 
-    setTasks(data);
+      const data = await res.json();
+
+      console.log("Tasks Data:", data);
+
+      if (res.ok) {
+        setTasks(data);
+      } else {
+        console.log("Failed to fetch tasks");
+      }
+    } catch (error) {
+      console.log("Fetch Error:", error);
+    }
   };
 
   useEffect(() => {
     fetchTasks();
   }, []);
 
-  // Create task
-  const createTask = async (e: any) => {
+  // Create Task
+  const createTask = async (
+    e: React.FormEvent<HTMLFormElement>
+  ) => {
     e.preventDefault();
 
-    await fetch("/api/tasks", {
-      method: "POST",
-      body: JSON.stringify(form),
-    });
+    try {
+      const res = await fetch("/api/tasks", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(form),
+      });
 
-    setForm({
-      title: "",
-      description: "",
-      priority: "medium",
-      dueDate: "",
-    });
+      console.log("Create Status:", res.status);
 
-    fetchTasks();
+      if (res.ok) {
+        setForm({
+          title: "",
+          description: "",
+          priority: "medium",
+          dueDate: "",
+        });
+
+        fetchTasks();
+      }
+    } catch (error) {
+      console.log("Create Error:", error);
+    }
   };
 
-  // Delete task
+  // Delete Task
   const deleteTask = async (id: string) => {
-    await fetch(`/api/tasks/${id}`, {
-      method: "DELETE",
-    });
+    try {
+      const res = await fetch(`/api/tasks/${id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
 
-    fetchTasks();
+      console.log("Delete Status:", res.status);
+
+      if (res.ok) {
+        fetchTasks();
+      }
+    } catch (error) {
+      console.log("Delete Error:", error);
+    }
   };
 
-  // Toggle complete
+  // Toggle Complete
   const toggleComplete = async (
     id: string,
     status: string
   ) => {
-    await fetch(`/api/tasks/${id}`, {
-      method: "PUT",
-      body: JSON.stringify({
-        status:
-          status === "completed"
-            ? "pending"
-            : "completed",
-      }),
-    });
+    try {
+      const res = await fetch(`/api/tasks/${id}`, {
+        method: "PUT",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          status:
+            status === "completed"
+              ? "pending"
+              : "completed",
+        }),
+      });
 
-    fetchTasks();
+      console.log("Update Status:", res.status);
+
+      if (res.ok) {
+        fetchTasks();
+      }
+    } catch (error) {
+      console.log("Update Error:", error);
+    }
   };
 
   const filteredTasks = tasks.filter((task) => {
@@ -107,6 +155,7 @@ export default function Dashboard() {
           onClick={async () => {
             await fetch("/api/auth/logout", {
               method: "POST",
+              credentials: "include",
             });
 
             window.location.href = "/login";
@@ -116,8 +165,8 @@ export default function Dashboard() {
         </button>
       </div>
 
-      {/* Create Task */}
       <div className="grid md:grid-cols-3 gap-8">
+        {/* Create Task */}
         <div className="bg-white/5 border border-white/10 backdrop-blur p-6 rounded-3xl">
           <h2 className="text-xl font-semibold mb-5">
             Create Task
@@ -138,6 +187,7 @@ export default function Dashboard() {
                 })
               }
               className="w-full p-3 rounded-xl bg-black/30 border border-white/10"
+              required
             />
 
             <textarea
@@ -150,6 +200,7 @@ export default function Dashboard() {
                 })
               }
               className="w-full p-3 rounded-xl bg-black/30 border border-white/10"
+              required
             />
 
             <select

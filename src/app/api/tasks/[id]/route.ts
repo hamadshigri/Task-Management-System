@@ -1,11 +1,12 @@
+export const runtime = "nodejs";
 import { connectDB } from "@/lib/db";
 import { getUserFromToken } from "@/lib/auth";
 import Task from "@/models/Task";
 
 type Params = {
-  params: Promise<{
+  params: {
     id: string;
-  }>;
+  };
 };
 
 // UPDATE TASK
@@ -25,7 +26,7 @@ export async function PUT(
       );
     }
 
-    const { id } = await params;
+    const { id } = params;    
 
     const body = await req.json();
 
@@ -67,7 +68,7 @@ export async function DELETE(
       );
     }
 
-    const { id } = await params;
+    const { id } = params;
 
     await Task.findOneAndDelete({
       _id: id,
