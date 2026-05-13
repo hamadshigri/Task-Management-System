@@ -4,6 +4,7 @@ import User from "@/models/User";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
+import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   try {
@@ -47,7 +48,7 @@ export async function POST(req: Request) {
       maxAge: 60 * 60 * 24 * 7,
     });
 
-    return Response.json({
+    return NextResponse.json({
       message: "Login successful",
       user: {
         id: user._id,
@@ -58,7 +59,7 @@ export async function POST(req: Request) {
   } catch (error) {
     console.log("LOGIN ERROR:", error);
 
-    return Response.json(
+    return NextResponse.json(
       { error: "Server error" },
       { status: 500 }
     );
